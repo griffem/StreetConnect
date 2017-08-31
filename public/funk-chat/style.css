@@ -1,0 +1,47 @@
+
+body 
+{ 
+    font: 15px Helvetica, Arial; 
+    background-color: lightblue; 
+    max-width: 100%; 
+    max-height: 100%; 
+}
+#message-send 
+{ 
+    background: blue; 
+    padding: 3px; 
+    position: fixed; 
+    bottom: 0; 
+    width: 100%; 
+}
+#message-send input[type=text] 
+{ 
+    border: 0; 
+    padding: 10px; 
+    width: 95%; 
+    margin-right: 0%; 
+}
+#message-send > #submit 
+{ 
+    color:black; 
+    background: #2D9F0B; 
+    border: none; 
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+#message-send > #submit:hover
+{
+    background-color: lightpink;
+}
+#messages 
+{ 
+    list-style-type: none; 
+    margin: 0; 
+    padding: 0; 
+}
+#notify 
+{ 
+    position: fixed; 
+    bottom: 42px; 
+    width: 100%; 
+}

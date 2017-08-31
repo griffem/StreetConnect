@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat | FunkChat </title>
+    <link rel="stylesheet" href="/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+</head>
+<body>
+    <script src="/client_chat.js"></script>
+    <ul id="messages"></ul>
+    <span id="notify"></span>
+        <div id = "message-send">
+            <input type="text" id="message" placeholder="Message" onKeyDown="notifyTyping(); if(event.keyCode==13) {submit();} ">
+            <input type="submit" id="submit" value="Send" onclick="submit()">
+        </div>    
+</body>
+
+
+<html>
