@@ -55,8 +55,8 @@ function match(user1, user2)
 	socket1.leave("waiting").join(roomName);
 	socket2.leave("waiting").join(roomName);
 	// Socket talks to itself
-	socket1.to(socket1.id, "Matched with: " + user2.username);
-	socket2.to(socket2.id, "Matched with: " + user1.username);
+	socket1.to(socket1.id).emit("Matched with: " + user2.username);
+	socket2.to(socket2.id).emit("Matched with: " + user1.username);
 }
 
 io.on('connection', function(socket) 
@@ -76,7 +76,7 @@ io.on('connection', function(socket)
 	{
 		console.log('message from ' + data.name + ' : ' + data.msg);
 		//send message to clients connected to that room
-		this.to(this.roomName).emit('chat', data); 
+		io.to(this.roomName).emit('chat', data); 
 	});
 	
 	socket.on('notify', function(user)
@@ -87,17 +87,7 @@ io.on('connection', function(socket)
 
 // Makes sure all registered info of the user/socket is gone
 function removeSocket(socket) {
-	var c = waiting.length;
-	for(var i = 0; i < c; i++) {
-		if(waiting[i].address == socket.handshake.address) {
-			main.queue.removeUser(waiting[i]);
-			waiting[i].splice(i, i+1);
-			return;
-		}
-	}
-	
-	// If the socket isn't in the waitlist
-	// CODE TELLING SOCKETS THAT OTHER USER HAS LEFT, return if you find the socket
+	io.to(socket.roomName).emit('chat', "The other user has disconnected.")
 	
 	// If the socket isn't on either:
 	console.log("SOCKET NOT REGISTERED DISCONNECTED: " + socket.id)
