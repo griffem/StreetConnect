@@ -12,37 +12,32 @@ exports.addUser = function(user) {
 	awaitingConnection.push(user);
 }
 
-exports.findUser = function(address) {
-	var c = awaitingConnection.length;
-    for(var i = 0; i < c; i++) {
-        if(awaitingConnection[i].address == address) {
-			return awaitingConnection[i];
-		}
-	}
-	return false;
-}
-
 // Adds the socket to the list of waiting, also initializes the roomName variable.
 function onConnect(socket) {
-	if(exports.findUser(socket.handshake.address) != false) {
-		awaitingConnection.splice(i, i+1);
-        user.socketId = socket.id;
+	var c = awaitingConnection.length;
+    for(var i = 0; i < c; i++) {
+        if(awaitingConnection[i].address == socket.handshake.address) {
 			
-        socket.roomName = "waiting";
-		console.log('User ' + user.socketId + " has connected.");
+			var user = awaitingConnection[i];
+			awaitingConnection.splice(i, i+1);
+            user.socketId = socket.id;
 			
-		// Now that a socket is connected, it tries to match
-		var info = main.queue.queueAdd(user);
-		if(info.user1 != "dead") {
-			match(info.user1, info.user2);
-		} else {
-			io.to("waiting").emit(user.username + " has joined the room.");
+            socket.roomName = "waiting";
+			console.log('User ' + user.socketId + " has connected.");
+			
+			// Now that a socket is connected, it tries to match
+			var info = main.queue.queueAdd(user);
+			if(info.user1 != "dead") {
+				match(info.user1, info.user2);
+			} else {
+				io.to("waiting").emit(user.username + " has joined the room.");
+			}
+            return;
 		}
-	} else {
-		// Socket talks to itself
-		socket.to(socket.id).emit("error", "SOCKET_NOT_QUEUED");
-		console.log("SOCKET NOT REGISTERED CONNECTED: " + socket.id);
-	}
+    }
+    // Socket talks to itself
+    socket.to(socket.id).emit("error", "SOCKET_NOT_QUEUED");
+    console.log("SOCKET NOT REGISTERED CONNECTED: " + socket.id);
 }
 
 // Creates a room for just the two users, removes them from waiting queue
