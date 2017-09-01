@@ -38,30 +38,34 @@ exports.removeUser = function(user) {
 	}
 }
 
-var chat = require('./chat');
 // the amount of users that can go through the queue before current user can be placed in high priority
-exports.queueAdd = function(userAdded, chat) {
+exports.queueAdd = function(userAdded) {
+	var ret = {user1 : "dead", user2 : "dead"}
 	for(var i = 0; i < interestsList.length; i++) {
 		var interestCat = interestsList[i];
 		if(interestMatch(interestCat.interest, userAdded.interests)) {
-			chat.match(userAdded, interestCat.user);// INSERT FUNCTION 
+			ret.user1 = userAdded; ret.user2 = interestCat.user;
 			exports.removeUser(interestCat.user);
-			return;
+			break;
 		} else {
 			interestCat.count += 1;
 			console.log(interestCat.count);
 			if(interestCat.count >= highPriority) {
-				highPriorityAdd(interestCat.user, chat);
+				ret = highPriorityAdd(interestCat.user);
 				interestsList.splice(i, i+1);
 				i--;
 			}
 		}
 	}
 	
-	var listCount = userAdded.interests.length;
-	for(var i = 0; i < listCount; i++) {
-		interestsList.push(new InterestCategory(userAdded.interests[i], userAdded));
+	if(ret.user1 == "dead") {
+		var listCount = userAdded.interests.length;
+		for(var i = 0; i < listCount; i++) {
+			interestsList.push(new InterestCategory(userAdded.interests[i], userAdded));
+		}
 	}
+	
+	return ret;
 }
 
 function InterestCategory(interestName, user) {
@@ -125,12 +129,13 @@ function interestMatch(interest, interestList) {
 	return false;
 }
 
-function highPriorityAdd(user, chat) {
+function highPriorityAdd(user) {
 	if(highPriorityUser != "") {
-		console.log("high user matched");
-		chat.match(user, highPriorityUser)// INSERT FUNCTION 
 		highPriorityUser = "";
+		return {user1 : user, user2 : highPriorityUser};
 	} else {
 		highPriorityUser = user;
+		exports.removeUser(user);
+		return {user1 : "dead", user2 : "dead"};
 	}
 }

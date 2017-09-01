@@ -18,8 +18,7 @@ app.use(express.static('public'));
 
 var chat = require('./chat');
 // banSystem = require('./bansystem');
-var queue = require('./queue');
-
+exports.queue = require('./queue');
 
 app.get('/', function(req, res)
 {
@@ -42,10 +41,8 @@ app.post('/', function (req, res, next) {
 		return;
 	}*/
 	
-	var user = new queue.User(address, req.body.name, req.body.interests);
-	chat.addUser(user)
-    queue.queueAdd(user, chat);
-    res.redirect('/chat');
+	chat.addUser(new exports.queue.User(address, req.body.name, req.body.interests));
+	res.redirect('/chat');
 });
 
 app.get('/chat', function(req, res)
