@@ -16,7 +16,7 @@ exports.findUser = function(address) {
 	var c = awaitingConnection.length;
     for(var i = 0; i < c; i++) {
         if(awaitingConnection[i].address == address) {
-			return awaitingConnection[i];
+			return i;
 		}
 	}
 	return false;
@@ -24,8 +24,9 @@ exports.findUser = function(address) {
 
 // Adds the socket to the list of waiting, also initializes the roomName variable.
 function onConnect(socket) {
-	if(exports.findUser(socket.handshake.address) != false) {
-		awaitingConnection.splice(i, i+1);
+	var index = exports.findUser(socket.handshake.address)
+	if(index != false) {
+		awaitingConnection.splice(index, index+1);
         user.socketId = socket.id;
 			
         socket.roomName = "waiting";
@@ -86,6 +87,7 @@ io.on('connection', function(socket)
 		console.log('message from ' + data.name + ' : ' + data.msg);
 		//send message to clients connected to that room
 		data.username = this.username;
+		console.log(data);
 		io.to(this.roomName).emit('chat', data);
 	});
 	
