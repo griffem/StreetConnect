@@ -57,7 +57,6 @@ function match(user1, user2)
 	// Socket talks to itself
 	socket1.to(socket1.id, "Matched with: " + user2.username);
 	socket2.to(socket2.id, "Matched with: " + user1.username);
-	console.log('inmatchfunction');
 }
 
 io.on('connection', function(socket) 
@@ -69,7 +68,7 @@ io.on('connection', function(socket)
 	socket.on('disconnect', function()
 	{
 		console.log("User " + socket.id + " has disconnected.");
-		removeSocket(this.socket);
+		removeSocket(this);
 	});
 		
 	//listen for 'chat' message from client
@@ -77,7 +76,7 @@ io.on('connection', function(socket)
 	{
 		console.log('message from ' + data.name + ' : ' + data.msg);
 		//send message to clients connected to that room
-		this.socket.to(this.socket.roomName).emit('chat', data); 
+		this.to(this.roomName).emit('chat', data); 
 	});
 	
 	socket.on('notify', function(user)
