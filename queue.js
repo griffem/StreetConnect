@@ -31,7 +31,7 @@ exports.User = function(address, username, interests) {
 
 exports.removeUser = function(user) {
 	for(var a = 0; a < interestsList.length; a++) {
-		if(interestMatch(interestsList[i].interest, userAdded.interests)) {
+		if(interestMatch(interestsList[a].interest, user.interests)) {
 			interestsList.splice(a, a+1);
 			a--;
 		}

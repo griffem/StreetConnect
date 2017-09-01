@@ -1,21 +1,25 @@
 //----------|SERVER SIDE|----------------------
 "use strict";
 var express = require('express');
-var chat = require('./chat');
-// banSystem = require('./bansystem');
-var queue = require('./queue');
 var bodyParser = require('body-parser');
 
 //setup express
 var app = express();
 exports.server = app.listen(3000);
 
+//bodyParser setup
 app.use(bodyParser.urlencoded({
     extended: true
 }));
 app.use(bodyParser.json());
 //use static files
-app.use(express.static('funk-chat'));
+app.use(express.static('public'));
+
+
+var chat = require('./chat');
+// banSystem = require('./bansystem');
+var queue = require('./queue');
+
 
 app.get('/', function(req, res)
 {
