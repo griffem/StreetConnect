@@ -30,9 +30,6 @@ app.post('/', function (req, res, next) {
 	
 	// Forms testing
     //var form = new formidable.IncomingForm();
-    console.log('info sent');
-    console.log(req.body.interests);
-    console.log(req.body.name);
 	
 	var address = req.connection.remoteAddress;
 	// Ban System Check => COMMENT OUT IF YOU DON'T WANT TO BOTHER WITH MONGO

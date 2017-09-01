@@ -29,13 +29,15 @@ exports.User = function(address, username, interests) {
 	this.socketId;
 }
 
-exports.removeUser = function(user) {
+exports.removeUser = function(user, i) {
 	for(var a = 0; a < interestsList.length; a++) {
 		if(interestMatch(interestsList[a].interest, user.interests)) {
 			interestsList.splice(a, a+1);
 			a--;
+			i--;
 		}
 	}
+	return i;
 }
 
 // the amount of users that can go through the queue before current user can be placed in high priority
@@ -49,11 +51,9 @@ exports.queueAdd = function(userAdded) {
 			break;
 		} else {
 			interestCat.count += 1;
-			console.log(interestCat.count);
 			if(interestCat.count >= highPriority) {
 				ret = highPriorityAdd(interestCat.user);
-				interestsList.splice(i, i+1);
-				i--;
+				if(highPriorityUser == user) { i--; }
 			}
 		}
 	}
@@ -101,7 +101,6 @@ function parseInterests(interests) {
 			if (current.charAt(0) == " ") {
 				while(current.charAt(0) == " ") {
 					current = current.slice(1);
-					console.log("test");
 				}
 				interestList[i] == current;
 			}
@@ -114,7 +113,6 @@ function parseInterests(interests) {
 			}
 		}
 	}
-	console.log(interestList);
 	return interestList;
 }
 

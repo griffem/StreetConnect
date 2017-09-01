@@ -3,7 +3,6 @@
 var socket = require('socket.io');
 var main = require('./index.js');
 var io = socket(main.server);
-var socketFile = require('./socket');
 // Users watching on matches
 
 var awaitingConnection = [];
@@ -16,7 +15,6 @@ exports.addUser = function(user) {
 // Adds the socket to the list of waiting, also initializes the roomName variable.
 function onConnect(socket) {
 	var c = awaitingConnection.length;
-	console.log(c);
     for(var i = 0; i < c; i++) {
         if(awaitingConnection[i].address == socket.handshake.address) {
 			
@@ -31,10 +29,11 @@ function onConnect(socket) {
 			var info = main.queue.queueAdd(user);
 			if(info.user1 != "dead") {
 				match(info.user1, info.user2);
+			} else {
+				io.to("waiting").emit(user.username + " has joined the room.");
 			}
             return;
 		}
-		console.log(c);
     }
     // Socket talks to itself
     socket.to(socket.id).emit("error", "SOCKET_NOT_QUEUED");
@@ -44,14 +43,19 @@ function onConnect(socket) {
 // Creates a room for just the two users, removes them from waiting queue
 function match(user1, user2)
 {
-	
 	var roomName = user1.socketId + '-' + user2.socketId;
-	console.log(roomName);
 	
+	// Finding sockets
 	var socket1 = io.sockets.sockets[user1.socketId];
 	var socket2 = io.sockets.sockets[user2.socketId];
+	
+	// Setting socket variables from user variabless
     socket1.roomName = roomName;
 	socket2.roomName = roomName;
+	socket1.userName = user1.username;
+	socket2.userName = user2.username;
+	
+	// Moving sockets from waiting room to user room
 	socket1.leave("waiting").join(roomName);
 	socket2.leave("waiting").join(roomName);
 	// Socket talks to itself
@@ -68,7 +72,7 @@ io.on('connection', function(socket)
 	socket.on('disconnect', function()
 	{
 		console.log("User " + socket.id + " has disconnected.");
-		removeSocket(this);
+		io.to(socket.roomName).emit('chat', { name: socket.id, username: socket.username, msg: "The other user has disconnected." } );
 	});
 		
 	//listen for 'chat' message from client
@@ -76,7 +80,8 @@ io.on('connection', function(socket)
 	{
 		console.log('message from ' + data.name + ' : ' + data.msg);
 		//send message to clients connected to that room
-		io.to(this.roomName).emit('chat', data); 
+		data.username = this.username;
+		io.to(this.roomName).emit('chat', data);
 	});
 	
 	socket.on('notify', function(user)
@@ -84,11 +89,3 @@ io.on('connection', function(socket)
 		io.emit('notify', user);
 	});
 });
-
-// Makes sure all registered info of the user/socket is gone
-function removeSocket(socket) {
-	io.to(socket.roomName).emit('chat', "The other user has disconnected.")
-	
-	// If the socket isn't on either:
-	console.log("SOCKET NOT REGISTERED DISCONNECTED: " + socket.id)
-}

@@ -1,4 +1,12 @@
+var i = 5;
 
+function removeI(i) {
+	i--;
+}
+
+console.log(i);
+removeI(i);
+console.log(i);
 /*
 // This is mostly unchanged, TODO: revamp
 exports.socketFile = function (io) {
