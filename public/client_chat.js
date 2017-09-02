@@ -22,7 +22,7 @@ function bl()
 */
 function submit()
 {
-    socket.emit('chat', { msg: document.getElementById('message').value, name: socket.id});
+    socket.emit('chat', { msg: document.getElementById('message').value, id: socket.id});
     document.getElementById('message').value = "";
 }
 

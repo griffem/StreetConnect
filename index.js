@@ -1,36 +1,52 @@
 //----------|SERVER SIDE|----------------------
 "use strict";
-var express = require('express');
-var bodyParser = require('body-parser');
 
 //setup express
+var express = require('express');
 var app = express();
 exports.server = app.listen(3000);
 
 //bodyParser setup
+var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({
     extended: true
 }));
 app.use(bodyParser.json());
-//use static files
-app.use(express.static('public'));
 
+// CookieParser setup
+var cookieParser = require('cookie-parser');
+app.use(cookieParser());
 
+// Setting up paths of use
+var path = require('path');
+app.use(express.static(path.join(__dirname, 'public')));
+app.set('views', path.join(__dirname, 'views')); 
+
+// Setting up server request logger
+var logger = require('morgan');
+app.use(logger('dev')); 
+
+// Handlebars View Engine setup
+var handlebars  = require('express-handlebars');
+app.engine('handlebars', handlebars({defaultLayout: 'main'}));
+app.set('view engine', 'handlebars');
+
+// Router setup
+var router = express.Router();
+app.use(router);
+
+// Homemade files setup
 var chat = require('./chat');
-// banSystem = require('./bansystem');
+//var banSystem = require('./bansystem');
 exports.queue = require('./queue');
 
+// GET and POST management
 app.get('/', function(req, res)
 {
-    res.sendFile(__dirname + '/public/funk-chat/index.html')
+    res.sendFile('index.html')
 });
 
-
 app.post('/', function (req, res, next) {
-	
-	// Forms testing
-    //var form = new formidable.IncomingForm();
-	
 	var address = req.connection.remoteAddress;
 	// Ban System Check => COMMENT OUT IF YOU DON'T WANT TO BOTHER WITH MONGO
 	/*if(banSystem.userConnect(address, res)) {
@@ -42,11 +58,30 @@ app.post('/', function (req, res, next) {
 	res.redirect('/chat');
 });
 
-app.get('/chat', function(req, res)
+router.get('/chat', function(req, res)
 {
 	if(chat.findUser(req.connection.remoteAddress) > -1) {
-		res.sendFile(__dirname + '/public/funk-chat/chat.html');
+		next();
 	} else {
 		res.redirect('/');
 	}
 });
+
+// ERROR HANDLING CODE BELOW
+app.use(function(err, req, res, next) {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+  // render the error page
+  res.status(err.status || 500);
+  res.render('error');
+});
+
+
+app.use(function(req, res, next) {  
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
+});
+

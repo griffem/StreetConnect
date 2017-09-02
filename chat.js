@@ -30,7 +30,6 @@ function onConnect(socket) {
 		awaitingConnection.splice(result, result+1);
         user.socketId = socket.id;
 		socket.username = user.username;
-        socket.roomName = "waiting";
 		console.log('User ' + user.socketId + " has connected.");
 			
 		// Now that a socket is connected, it tries to match
@@ -38,7 +37,9 @@ function onConnect(socket) {
 		if(info.user1 != "dead") {
 			match(info.user1, info.user2);
 		} else {
-			io.to("waiting").emit(user.username + " has joined the room.");
+			socket.roomName = "waiting";
+			socket.join("waiting");
+			io.to("waiting").emit("chat", { id: socket.id, username: "Server", msg: socket.username + " has joined the room.", code: 1 });
 		}
 	} else {
 		// Socket talks to itself
@@ -60,37 +61,43 @@ function match(user1, user2)
     socket1.roomName = roomName;
 	socket2.roomName = roomName;
 	
-	// Moving sockets from waiting room to user room
-	socket1.leave("waiting").join(roomName);
+	// Since socket 2 was in the waiting room beforehand
+	io.to("waiting").emit("chat", { id: socket2.id, username: "Server", msg: socket2.username + " has left the room.", code: 2 });
 	socket2.leave("waiting").join(roomName);
+	
 	// Socket talks to itself
-	socket1.to(socket1.id).emit("Matched with: " + user2.username);
-	socket2.to(socket2.id).emit("Matched with: " + user1.username);
+	socket1.to(socket1.id).emit("chat", { id: socket2.id, username: "Server", msg: "Matched with: " + user2.username, code: 3 });
+	socket2.to(socket2.id).emit("chat", { id: socket1.id, username: "Server", msg: "Matched with: " + user1.username, code: 3 });
 }
 
 io.on('connection', function(socket) 
 {
+	// Initializes the socket address variable, and roomname, tries to match the socket if possible
 	onConnect(socket);
-	// Adds the socket to the list of waiting, also initializes the roomName variable.
+	
 
-	//disconnect
+	// Disconnect Function
 	socket.on('disconnect', function()
 	{
 		console.log("User " + socket.id + " has disconnected.");
-		io.to(socket.roomName).emit('chat', { name: socket.id, username: socket.username, msg: "The other user has disconnected." } );
+		io.to(this.roomName).emit('chat', { id: this.id, username: "Server", msg: this.username + " has disconnected. Connect to the userpage to chat again.", code: 4 } );
 	});
 		
-	//listen for 'chat' message from client
+	// Listen for 'chat' message from client
 	socket.on('chat', function(data)
 	{
-		console.log('message from ' + data.name + ' : ' + data.msg);
-		//send message to clients connected to that room
+		console.log('message from ' + data.id + ': ' + data.msg);
+		// Send message to clients connected to that room
 		data.username = this.username;
+		data.code = 0;
 		io.to(this.roomName).emit('chat', data);
 	});
-	
-	socket.on('notify', function(user)
-	{
-		io.emit('notify', user);
-	});
 });
+
+/* List of numbers and meaning that can be put inside data.code:
+0: message
+1: A user joined
+2: A user left (changed channels)
+3: Matched with user
+4: A user disconnected
+*/
