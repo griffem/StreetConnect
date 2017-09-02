@@ -54,7 +54,7 @@ function notifyTyping()
 
 socket.on('chat', function(data)
 {
-    document.getElementById('messages').innerHTML += '<p><li>' + '<b>' + data.name + '</b><br>' + data.msg + "</li></p>";
+    document.getElementById('messages').innerHTML += '<p><li>' + '<b>' + data.username + '</b><br>' + data.msg + "</li></p>";
 });
 
 socket.on('notify', function(user)

@@ -64,7 +64,7 @@ exports.queueAdd = function(userAdded) {
 			interestsList.push(new InterestCategory(userAdded.interests[i], userAdded));
 		}
 	}
-	
+	console.log(ret);
 	return ret;
 }
 

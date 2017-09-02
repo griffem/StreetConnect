@@ -16,18 +16,20 @@ exports.findUser = function(address) {
 	var c = awaitingConnection.length;
     for(var i = 0; i < c; i++) {
         if(awaitingConnection[i].address == address) {
-			return awaitingConnection[i];
+			return i;
 		}
 	}
-	return false;
+	return -1;
 }
 
 // Adds the socket to the list of waiting, also initializes the roomName variable.
 function onConnect(socket) {
-	if(exports.findUser(socket.handshake.address) != false) {
-		awaitingConnection.splice(i, i+1);
+	var result = exports.findUser(socket.handshake.address);
+	if(result > -1) {
+		var user = awaitingConnection[result];
+		awaitingConnection.splice(result, result+1);
         user.socketId = socket.id;
-			
+		socket.username = user.username;
         socket.roomName = "waiting";
 		console.log('User ' + user.socketId + " has connected.");
 			
@@ -57,8 +59,6 @@ function match(user1, user2)
 	// Setting socket variables from user variabless
     socket1.roomName = roomName;
 	socket2.roomName = roomName;
-	socket1.userName = user1.username;
-	socket2.userName = user2.username;
 	
 	// Moving sockets from waiting room to user room
 	socket1.leave("waiting").join(roomName);
