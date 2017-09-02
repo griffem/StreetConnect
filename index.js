@@ -15,6 +15,9 @@ app.use(bodyParser.json());
 //use static files
 app.use(express.static('public'));
 
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'jade');
+
 
 var chat = require('./chat');
 // banSystem = require('./bansystem');
@@ -44,5 +47,9 @@ app.post('/', function (req, res, next) {
 
 app.get('/chat', function(req, res)
 {
-    res.sendFile(__dirname + '/public/funk-chat/chat.html');
+	if(chat.findUser(res.connection.remoteAddress) != false) {
+		res.sendFile(__dirname + '/public/funk-chat/chat.html');
+	} else {
+		res.redirect('/');
+	}
 });
