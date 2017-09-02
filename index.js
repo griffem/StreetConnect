@@ -30,9 +30,6 @@ app.post('/', function (req, res, next) {
 	
 	// Forms testing
     //var form = new formidable.IncomingForm();
-    console.log('info sent');
-    console.log(req.body.interests);
-    console.log(req.body.name);
 	
 	var address = req.connection.remoteAddress;
 	// Ban System Check => COMMENT OUT IF YOU DON'T WANT TO BOTHER WITH MONGO
@@ -47,5 +44,9 @@ app.post('/', function (req, res, next) {
 
 app.get('/chat', function(req, res)
 {
-    res.sendFile(__dirname + '/public/funk-chat/chat.html');
+	if(chat.findUser(req.connection.remoteAddress) > -1) {
+		res.sendFile(__dirname + '/public/funk-chat/chat.html');
+	} else {
+		res.redirect('/');
+	}
 });
