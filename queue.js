@@ -20,6 +20,7 @@ app.post('/', function (req, res) {
 
 // START OF ACTUAL QUEUE FILE
 
+// the amount of users that can go through the queue before current user can be placed in high priority
 var highPriority = 10;
 
 exports.User = function(address, username, interests) {
@@ -40,7 +41,7 @@ exports.removeUser = function(user, i) {
 	return i;
 }
 
-// the amount of users that can go through the queue before current user can be placed in high priority
+// If there is a match, userAdded will always be returned as user1
 exports.queueAdd = function(userAdded) {
 	var ret = {user1 : "dead", user2 : "dead"}
 	for(var i = 0; i < interestsList.length; i++) {
