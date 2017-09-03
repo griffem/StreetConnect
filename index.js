@@ -6,6 +6,11 @@ var express = require('express');
 var app = express();
 exports.server = app.listen(3000);
 
+// Setup database 
+exports.mongoose = require('mongoose');
+exports.db = mongoose.createConnection("mongodb://localhost:27017/myproject"); // CREATE YOUR OWN MONGO SERVER WITH SAME PORT
+exports.db.on('error', console.error.bind(console, 'mongodb connection error:'));
+
 //bodyParser setup
 var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({

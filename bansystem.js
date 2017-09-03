@@ -1,19 +1,13 @@
 "use strict";
-var express = require("express");
-var app = express();
+var main = require("./index");
 var assert = require('assert');
 
-var mongoose = require('mongoose');
-var url = "mongodb://localhost:27017/myproject" // CREATE YOUR OWN MONGO SERVER WITH SAME PORT
-var db = mongoose.createConnection(url);
-db.on('error', console.error.bind(console, 'connection error:'));
-
 var collectionName = "ipaddresses";
-
-var banSchema = new mongoose.Schema( { ip : String, reports : Number, ban : Number } );
-var banModel = db.model(collectionName, banSchema);
+var banSchema = new main.mongoose.Schema( { ip : String, reports : Number, ban : Number } );
+var banModel = main.db.model(collectionName, banSchema);
 
 var banTime = 60000; // banTime is in milliseconds
+
 
 // Checks if ip address is in db, and if it is, adds one to it, if it isn't creates it and adds one to it. If it reaches three, a ban timeout of 3 days is set.
 function addOne(address) {
