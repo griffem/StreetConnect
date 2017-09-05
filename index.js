@@ -58,7 +58,7 @@ app.post('/', function (req, res, next) {
 	res.redirect('/chat');
 });
 
-router.get('/chat', function(req, res)
+router.get('/chat', function(req, res, next)
 {
 	if(chat.findUser(req.connection.remoteAddress) > -1) {
 		next();
@@ -67,7 +67,12 @@ router.get('/chat', function(req, res)
 	}
 });
 
-// ERROR HANDLING CODE BELOW
+app.get('/chat', function(req, res)
+{
+	res.sendFile(__dirname + '/public/chat.html')
+});
+
+/*// ERROR HANDLING CODE BELOW
 app.use(function(err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
@@ -75,8 +80,8 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render('error');
-});
+  res.send('error');
+});*/
 
 
 app.use(function(req, res, next) {  

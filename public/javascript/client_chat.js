@@ -57,6 +57,11 @@ socket.on('chat', function(data)
     document.getElementById('messages').innerHTML += '<p><li>' + '<b>' + data.username + '</b><br>' + data.msg + "</li></p>";
 });
 
+socket.on(socket.id, function(data)
+{
+    document.getElementById('messages').innerHTML += '<p><li>' + '<b>' + data.username + '</b><br>' + data.msg + "</li></p>";
+});
+
 socket.on('notify', function(user)
 {
     if(user)
