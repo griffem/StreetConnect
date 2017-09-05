@@ -31,11 +31,12 @@ function onConnect(socket) {
         user.socketId = socket.id;
 		socket.username = user.username;
 		console.log('User ' + user.socketId + " has connected.");
-			
+		
 		// Now that a socket is connected, it tries to match
 		var info = main.queue.queueAdd(user);
 		if(info.user1 != "dead") {
 			match(info.user1, info.user2);
+			console.log("matched");
 		} else {
 			socket.roomName = "waiting";
 			socket.join("waiting");
@@ -63,11 +64,12 @@ function match(user1, user2)
 	
 	// Since socket 2 was in the waiting room beforehand
 	io.to("waiting").emit("chat", { id: socket2.id, username: "Server", msg: socket2.username + " has left the room.", code: 2 });
+	socket1.join(roomName);
 	socket2.leave("waiting").join(roomName);
 	
 	// Socket talks to itself
-	socket1.to(socket1.id).emit("chat", { id: socket2.id, username: "Server", msg: "Matched with: " + user2.username, code: 3 });
-	socket2.to(socket2.id).emit("chat", { id: socket1.id, username: "Server", msg: "Matched with: " + user1.username, code: 3 });
+	io.to(socket1.id).emit("chat", { id: socket2.id, username: "Server", msg: "Matched with: " + user2.username, code: 3 });
+	io.to(socket2.id).emit("chat", { id: socket1.id, username: "Server", msg: "Matched with: " + user1.username, code: 3 });
 }
 
 io.on('connection', function(socket) 
