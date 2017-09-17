@@ -22,8 +22,12 @@ function bl()
 */
 function submit()
 {
-    socket.emit('chat', { msg: document.getElementById('message').value, id: socket.id});
-    document.getElementById('message').value = "";
+    if(document.getElementById('message').value) {
+        socket.emit('chat', { msg: document.getElementById('message').value, id: socket.id});
+        document.getElementById('message').value = "";
+    } else {
+        // Since the message box was empty, show a visual cue i.e. tooltip
+    }
 }
 
 var typing = false;

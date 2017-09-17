@@ -53,9 +53,12 @@ app.post('/', function (req, res, next) {
 		res.redirect("www.lemonparty.org");
 		return;
 	}*/
-	
+	if(req.body.name) {
 	chat.addUser(new exports.queue.User(address, req.body.name, req.body.interests));
 	res.redirect('/chat');
+    } else {
+        // Visual UI response
+    }
 });
 
 router.get('/chat', function(req, res, next)
